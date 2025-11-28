@@ -7,7 +7,9 @@ const icons = {
     rain: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-blue-300"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15a4.5 4.5 0 004.5 4.5H18a3.75 3.75 0 001.332-7.257 3 3 0 00-3.758-3.848 5.25 5.25 0 00-10.233 2.33A4.502 4.502 0 002.25 15z" /><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5v2.25M13.5 19.5v2.25M7.5 19.5v2.25M16.5 19.5v2.25" /></svg>`
 };
 
-const BASE_URL = 'api.php';
+// [PERUBAHAN 1] Mengarah ke Vercel Serverless Function, bukan PHP
+const BASE_URL = '/api/weather'; 
+
 let currentCityId = null;
 let currentCityName = null;
 let isDarkMode = false;
@@ -23,30 +25,28 @@ document.addEventListener('DOMContentLoaded', function() {
     initAutoLocation();
 });
 
-async function loadFavoriteCities() {
+// [PERUBAHAN 2] Load Favorit dari LocalStorage (Client Side Only)
+function loadFavoriteCities() {
     try {
-        const response = await fetch(`${BASE_URL}?action=favorites`);
-        const result = await response.json();
-        if (result.status === 'success') {
-            favoriteCities = result.data;
+        const saved = localStorage.getItem('favoriteCities');
+        if (saved) {
+            favoriteCities = JSON.parse(saved);
         }
     } catch (error) {
-        console.error('Gagal memuat favorit dari server:', error);
+        console.error('Gagal memuat favorit local:', error);
+        favoriteCities = [];
     }
     renderFavoritesUI();
 }
 
-async function syncFavorites() {
+// [PERUBAHAN 3] Simpan Favorit ke LocalStorage (Client Side Only)
+function syncFavorites() {
     try {
-        await fetch(`${BASE_URL}?action=favorites`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ favorites: favoriteCities })
-        });
+        localStorage.setItem('favoriteCities', JSON.stringify(favoriteCities));
         renderFavoritesUI();
         updateFavoriteButton(); 
     } catch (error) {
-        console.error('Gagal menyimpan favorit ke server:', error);
+        console.error('Gagal menyimpan favorit:', error);
         showError('Gagal menyimpan favorit');
     }
 }
@@ -60,6 +60,7 @@ function renderFavoritesUI() {
 
     let html = '<span class="text-xs font-semibold uppercase tracking-wider opacity-60 mr-2">Tersimpan:</span>';
     favoriteCities.forEach(city => {
+        // Encode parameter agar aman jika nama kota mengandung karakter khusus
         html += `
             <button onclick="selectCity('${city.name}', '${city.name}')" 
                 class="px-3 py-1 bg-white/20 hover:bg-white/30 border border-white/10 rounded-full text-xs font-semibold transition flex items-center gap-1 group">
@@ -80,7 +81,7 @@ function toggleFavorite() {
     } else {
         favoriteCities.push({ name: currentCityName, id: currentCityId });
     }
-    syncFavorites();
+    syncFavorites(); // Panggil fungsi sync lokal yang baru
 }
 
 function deleteFavorite(cityName) {
@@ -130,6 +131,7 @@ function searchCity(query) {
     clearTimeout(searchTimeout);
     searchTimeout = setTimeout(async () => {
         try {
+            // Fetch ke API Serverless baru
             const response = await fetch(`${BASE_URL}?action=search&q=${query}`);
             const cities = await response.json();
             if (!cities || cities.length === 0) {
@@ -180,6 +182,7 @@ async function loadWeatherData(cityId) {
     try {
         showLoading();
         hideError();
+        // Fetch ke API Serverless baru
         const response = await fetch(`${BASE_URL}?action=weather&id=${cityId}`);
         const data = await response.json();
         if (data.error) throw new Error(data.error.message || 'Lokasi tidak ditemukan');
