@@ -1,0 +1,273 @@
+/**
+ * Weather Dashboard - Enterprise Edition Styles
+ * Professional Glassmorphism & Micro-interactions
+ */
+
+/* ============================================
+   ROOT VARIABLES
+   ============================================ */
+:root {
+   /* Glass Variables */
+   --glass-border: rgba(255, 255, 255, 0.2);
+   --glass-bg: rgba(255, 255, 255, 0.1);
+   --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+   
+   /* Animation Speeds */
+   --anim-fast: 0.2s;
+   --anim-med: 0.3s;
+   --anim-slow: 0.5s;
+}
+
+/* ============================================
+   GLOBAL BODY & BACKGROUNDS
+   ============================================ */
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif; /* Sesuai import Google Font di HTML */
+    min-height: 100vh;
+    transition: background 0.5s ease, color 0.3s ease;
+    overflow-x: hidden;
+}
+
+/* LIGHT MODE: Modern Corporate Gradient (Blue/Cyan/Purple subtle) */
+body.light-mode {
+    background: linear-gradient(120deg, #89f7fe 0%, #66a6ff 100%);
+    /* Alternatif yang lebih hangat: background: linear-gradient(120deg, #f6d365 0%, #fda085 100%); */
+    color: #1e293b; /* Slate-800 */
+}
+
+/* DARK MODE: Deep Enterprise Dark (Slate/Navy) */
+body.dark-mode {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+    color: #f8fafc; /* Slate-50 */
+}
+
+/* Animasi Background Bergerak (Optional - untuk kesan dinamis) */
+body {
+    background-size: 200% 200%;
+    animation: gradientMove 15s ease infinite;
+}
+
+@keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* ============================================
+   GLASSMORPHISM CORE
+   ============================================ */
+.glass-effect, 
+.weather-card, 
+#suggestions,
+.suggestion-item:hover {
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px); /* Safari support */
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+}
+
+/* Penyesuaian Glass untuk Dark Mode agar kontras lebih baik */
+.dark-mode .glass-effect, 
+.dark-mode .weather-card {
+    background: rgba(15, 23, 42, 0.4); /* Lebih gelap */
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* ============================================
+   WEATHER CARD INTERACTIVITY
+   ============================================ */
+.weather-card {
+    position: relative;
+    overflow: hidden;
+    transition: transform var(--anim-med) cubic-bezier(0.34, 1.56, 0.64, 1), 
+                box-shadow var(--anim-med) ease,
+                background-color var(--anim-med) ease;
+}
+
+/* Hover Lift Effect */
+.weather-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Shine Animation Effect */
+.weather-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -150%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent
+    );
+    transform: skewX(-20deg);
+    transition: left 0.5s ease;
+    pointer-events: none;
+}
+
+.weather-card:hover::after {
+    left: 150%;
+    transition: left 0.7s ease;
+}
+
+/* ============================================
+   TYPOGRAPHY & ICONS
+   ============================================ */
+/* Text Shadow halus untuk keterbacaan di atas glass */
+h1, #cityName, #temperature, .font-bold {
+    text-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.dark-mode h1, .dark-mode #cityName, .dark-mode #temperature {
+    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+/* Icon Floating Animation */
+#weatherIcon {
+    animation: floatIcon 6s ease-in-out infinite;
+    filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));
+}
+
+@keyframes floatIcon {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-10px) rotate(2deg); }
+}
+
+/* ============================================
+   SEARCH INPUT & AUTOCOMPLETE
+   ============================================ */
+#searchInput {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: inherit;
+    transition: all var(--anim-med) ease;
+}
+
+/* Style khusus placeholder agar terlihat jelas di background warna-warni */
+#searchInput::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+.light-mode #searchInput::placeholder {
+    color: rgba(0, 0, 0, 0.5); /* Gelap di light mode agar terbaca */
+}
+
+#searchInput:focus {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.1);
+    transform: scale(1.01);
+}
+
+/* Dropdown Animation */
+#suggestions {
+    transform-origin: top center;
+    animation: dropdownEnter 0.2s ease-out forwards;
+    background: rgba(255, 255, 255, 0.9); /* Lebih solid agar terbaca */
+}
+
+.dark-mode #suggestions {
+    background: rgba(30, 41, 59, 0.95);
+    border-color: rgba(255,255,255,0.1);
+}
+
+@keyframes dropdownEnter {
+    from { opacity: 0; transform: translateY(-10px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ============================================
+   BUTTONS & CONTROLS
+   ============================================ */
+button {
+    /* Menghilangkan tap highlight di mobile */
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Animasi klik */
+button:active {
+    transform: scale(0.95);
+}
+
+/* Tombol Header (Theme/Unit/Refresh) */
+header button {
+    border: 1px solid transparent;
+}
+header button:hover {
+    border-color: rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* ============================================
+   LOADING & ERROR STATES
+   ============================================ */
+.loading-spinner {
+    width: 48px;
+    height: 48px;
+    border: 5px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    border-top-color: currentColor; /* Mengikut warna text parent */
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Error Toast Animation */
+#errorMessage {
+    animation: slideUpFade 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes slideUpFade {
+    from { opacity: 0; transform: translateY(100%); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================
+   SCROLLBAR (Custom Webkit)
+   ============================================ */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+/* ============================================
+   UTILITY CLASSES (JS Helper)
+   ============================================ */
+.fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Staggered Animation untuk Forecast Cards */
+#forecast > div {
+    opacity: 0;
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+#forecast > div:nth-child(1) { animation-delay: 0.1s; }
+#forecast > div:nth-child(2) { animation-delay: 0.2s; }
+#forecast > div:nth-child(3) { animation-delay: 0.3s; }
